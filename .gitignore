@@ -1,0 +1,107 @@
+# ============================================
+# ARCHIVOS PESADOS - ARCHIVOS GRANDES A IGNORAR
+# ============================================
+
+# Datasets grandes que exceden límites de GitHub
+*.csv
+*.tsv
+*.xlsx
+*.xls
+
+# Modelos entrenados grandes
+*.h5
+*.weights.h5
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.ckpt
+
+# Checkpoints de TensorFlow
+CheckPoint/
+checkpoints/
+*.data-00000-of-00001
+*.index
+
+# Carpetas de imágenes grandes
+Dataset/
+Test/
+train_images/
+test_images/
+images/
+
+# Archivos comprimidos grandes
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+# ============================================
+# ARCHIVOS TEMPORALES Y SISTEMA
+# ============================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# ============================================
+# EXCEPCIONES - ARCHIVOS PEQUEÑOS A INCLUIR
+# ============================================
+
+# Permitir CSVs pequeños específicos de proyectos
+!DS_APLICADO_NEGOCIOS/1. Human Resources/Human_Resources.csv
+!DS_APLICADO_NEGOCIOS/5. Public Relations Department/amazon_alexa.tsv
+!DS_APLICADO_NEGOCIOS/6. Maintenance Department/defect_and_no_defect.csv
+
+# Permitir CSVs pequeños de configuración
+!*config*.csv
+!*sample*.csv
+
+# Permitir imágenes pequeñas de documentación
+!docs/**/*.png
+!docs/**/*.jpg
+!README_images/*.png

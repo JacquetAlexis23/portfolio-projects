@@ -1,0 +1,36 @@
+# Transformer Neural Machine Translation - Requirements
+# Compatible con Python 3.8+
+
+# Core ML/DL Dependencies
+tensorflow>=2.10.0,<2.16.0
+tensorflow-datasets>=4.8.2,<5.0.0
+numpy>=1.21.0,<1.25.0
+
+# Data Processing
+pandas>=1.5.0,<2.1.0
+pathlib2>=2.3.0
+
+# Text Processing
+sentencepiece>=0.1.97
+regex>=2022.3.2
+
+# Visualization & Analysis
+matplotlib>=3.5.0,<3.8.0
+seaborn>=0.11.0,<0.13.0
+plotly>=5.10.0,<5.18.0
+
+# Development & Documentation
+jupyter>=1.0.0
+notebook>=6.4.0
+ipywidgets>=7.6.0
+
+# Optional: GPU Support (uncomment if using GPU)
+# tensorflow-gpu>=2.10.0,<2.16.0
+
+# Production Deployment (optional)
+# flask>=2.2.0
+# fastapi>=0.95.0
+# uvicorn>=0.20.0
+
+# Google Drive Downloads (for automatic dataset downloading)
+gdown>=4.6.0

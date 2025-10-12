@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FleetLogix ER Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        h1 { text-align: center; color: #333; }
+        .diagram-container { 
+            background: white; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 20px 0; 
+        }
+    </style>
+</head>
+<body>
+    <h1>FleetLogix Database - ER Diagram</h1>
+    <div class="diagram-container">
+        <div class="mermaid">
+            %%{init: {'er': {'fontSize': 12}}}%%
+            erDiagram
+                VEHICLES {
+                    int vehicle_id PK
+                    string license_plate UK "NOT NULL"
+                    string vehicle_type "NOT NULL"
+                    decimal capacity_kg
+                    string fuel_type
+                    date acquisition_date
+                    string status "DEFAULT 'active'"
+                }
+
+                DRIVERS {
+                    int driver_id PK
+                    string employee_code UK "NOT NULL"
+                    string first_name "NOT NULL"
+                    string last_name "NOT NULL"
+                    string license_number UK "NOT NULL"
+                    date license_expiry
+                    string phone
+                    date hire_date
+                    string status "DEFAULT 'active'"
+                }
+
+                ROUTES {
+                    int route_id PK
+                    string route_code UK "NOT NULL"
+                    string origin_city "NOT NULL"
+                    string destination_city "NOT NULL"
+                    decimal distance_km
+                    decimal estimated_duration_hours
+                    decimal toll_cost "DEFAULT 0"
+                }
+
+                TRIPS {
+                    int trip_id PK
+                    int vehicle_id FK
+                    int driver_id FK
+                    int route_id FK
+                    timestamp departure_datetime "NOT NULL"
+                    timestamp arrival_datetime
+                    decimal fuel_consumed_liters
+                    decimal total_weight_kg
+                    string status "DEFAULT 'in_progress'"
+                }
+
+                DELIVERIES {
+                    int delivery_id PK
+                    int trip_id FK
+                    string tracking_number UK "NOT NULL"
+                    string customer_name "NOT NULL"
+                    text delivery_address "NOT NULL"
+                    decimal package_weight_kg
+                    timestamp scheduled_datetime
+                    timestamp delivered_datetime
+                    string delivery_status "DEFAULT 'pending'"
+                    boolean recipient_signature "DEFAULT FALSE"
+                }
+
+                MAINTENANCE {
+                    int maintenance_id PK
+                    int vehicle_id FK
+                    date maintenance_date "NOT NULL"
+                    string maintenance_type "NOT NULL"
+                    text description
+                    decimal cost
+                    date next_maintenance_date
+                    string performed_by
+                }
+
+                %% Relationships with Cardinalities
+                VEHICLES ||--o{ TRIPS : "1:N operates"
+                DRIVERS ||--o{ TRIPS : "1:N conducts"
+                ROUTES ||--o{ TRIPS : "1:N follows"
+                TRIPS ||--o{ DELIVERIES : "1:N contains (2-6)"
+                VEHICLES ||--o{ MAINTENANCE : "1:N requires"
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            er: {
+                fontSize: 12,
+                useMaxWidth: true
+            }
+        });
+    </script>
+</body>
+</html>

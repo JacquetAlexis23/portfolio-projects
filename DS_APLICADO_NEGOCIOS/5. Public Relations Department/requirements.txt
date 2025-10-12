@@ -1,0 +1,60 @@
+# Public Relations Department - Sentiment Analysis
+# Requirements for Python 3.8+
+
+# Natural Language Processing
+nltk>=3.7
+spacy>=3.4.0
+textblob>=0.17.0
+vaderSentiment>=3.3.0
+
+# Advanced NLP and Transformers
+transformers>=4.15.0
+torch>=1.10.0
+sentence-transformers>=2.2.0
+
+# Core Data Science Libraries
+pandas>=1.3.0
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Machine Learning
+scikit-learn>=1.0.0
+xgboost>=1.5.0
+
+# Text Processing and Features
+gensim>=4.1.0
+wordcloud>=1.8.0
+
+# Data Visualization
+matplotlib>=3.4.0
+seaborn>=0.11.0
+plotly>=5.0.0
+
+# Web Scraping (for future expansions)
+beautifulsoup4>=4.10.0
+requests>=2.27.0
+scrapy>=2.5.0
+
+# Text Preprocessing
+regex>=2021.11.0
+contractions>=0.1.0
+
+# Model Persistence
+joblib>=1.1.0
+pickle-mixin>=1.0.2
+
+# Jupyter Notebook
+jupyter>=1.0.0
+ipykernel>=6.0.0
+ipywidgets>=7.6.0
+
+# Progress Bars
+tqdm>=4.62.0
+
+# Configuration Management
+python-dotenv>=0.19.0
+
+# Optional: For production deployment
+# flask>=2.0.0
+# fastapi>=0.70.0
+# streamlit>=1.10.0

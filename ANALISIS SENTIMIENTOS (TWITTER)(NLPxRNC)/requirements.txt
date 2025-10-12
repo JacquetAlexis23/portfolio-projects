@@ -1,0 +1,44 @@
+# Twitter Sentiment Analysis - Deep CNN Model
+# Production-ready requirements for social media sentiment analysis
+
+# Core Deep Learning Framework
+tensorflow>=2.10.0,<3.0.0
+tensorflow-datasets>=4.7.0
+
+# Data Processing and Analysis
+pandas>=1.5.0
+numpy>=1.21.0
+
+# Text Processing and Web Scraping
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+
+# Regular Expression Support (built-in with Python)
+# re - Standard library
+
+# File and Path Management
+pathlib  # Standard library in Python 3.4+
+
+# Mathematical Operations
+# math - Standard library
+
+# Optional: For enhanced functionality
+# jupyter>=1.0.0  # Uncomment if running in Jupyter
+# matplotlib>=3.5.0  # Uncomment for advanced visualizations
+# seaborn>=0.11.0  # Uncomment for statistical plots
+# scikit-learn>=1.1.0  # Uncomment for additional ML metrics
+
+# Development and Testing (optional)
+# pytest>=7.0.0
+# black>=22.0.0
+# flake8>=5.0.0
+
+# Google Drive Downloads (for automatic dataset downloading)
+gdown>=4.6.0
+
+# Notes:
+# - TensorFlow 2.10+ includes Keras by default
+# - BeautifulSoup4 handles HTML parsing in tweets
+# - TensorFlow-datasets provides SubwordTextEncoder
+# - Versions specified ensure compatibility and stability
+# - All dependencies tested on Python 3.8+
