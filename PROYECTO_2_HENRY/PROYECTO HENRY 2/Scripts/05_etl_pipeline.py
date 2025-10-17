@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🚀 FLEETLOGIX OPTIMIZED ETL PIPELINE - CIENTÍFICO DE DATOS SENIOR
+🚀 FLEETLOGIX OPTIMIZED ETL PIPELINE - CIENTÍFICO DE DATOS
 📊 Pipeline ETL Científico 100% COHERENTE con 04_dimensional_model.sql
 🎯 Columnas calculadas basadas en DATOS REALES de PostgreSQL
 📅 Octubre 2025
@@ -70,8 +70,8 @@ class ETLConfig:
     
     snowflake_config = {
         'user': 'ALEXISJACQUET',
-        'password': 'Bahamas36703418',
-        'account': 'kw63767.mexico-central.azure',
+        'password': 'xxxxxxxxxx', # Reemplazar con variable de entorno en producción
+        'account': 'xxxxxxxxxx', # Reemplazar con variable de entorno en producción
         'warehouse': 'FLEETLOGIX_WH',
         'database': 'FLEETLOGIX_DW',
         'schema': 'ANALYTICS'
@@ -731,40 +731,99 @@ class CoherentETL:
 
     def load_to_snowflake(self, data_dict: Dict[str, pd.DataFrame]) -> bool:
         """
-        Carga tablas en Snowflake mediante INSERT (NO crea tablas)
+        Carga tablas en Snowflake mediante INSERT incremental (NO crea tablas)
         Las tablas DEBEN existir previamente (creadas por 04_dimensional_model.sql)
+        
+        LÓGICA INCREMENTAL PARA EVITAR DUPLICADOS:
+        - dim_route: Comparar por route_id (solo nuevos routes)
+        - dim_vehicle: Comparar por vehicle_id + status (nuevos vehicles o cambios de status)
+        - dim_driver: Comparar por driver_id + status (nuevos drivers o cambios de status)
+        - Dimensiones dinámicas (date, time, customer): Siempre cargar (append)
+        - Fact tables: Siempre append (datos históricos)
         """
-        logger.info("💾 Iniciando carga a Snowflake (INSERT en tablas existentes)")
+        logger.info("💾 Iniciando carga incremental a Snowflake (INSERT en tablas existentes)")
 
         try:
             from snowflake.connector.pandas_tools import write_pandas
 
+            # Definir criterios de comparación para dimensiones estáticas
+            comparison_criteria = {
+                'dim_route': ['route_id'],
+                'dim_vehicle': ['vehicle_id', 'status'],
+                'dim_driver': ['driver_id', 'status']
+            }
+
+            static_dimensions = set(comparison_criteria.keys())
+            dynamic_dimensions = {'dim_date', 'dim_time', 'dim_customer'}
+            fact_tables = {'fact_deliveries'}
+
             for table_name, df in data_dict.items():
-                logger.info(f"📤 Insertando en {table_name}...")
-
-                # Usar nombres de tabla en MAYÚSCULAS
                 table_name_upper = table_name.upper()
+                
+                # LÓGICA INCREMENTAL PARA DIMENSIONES ESTÁTICAS
+                if table_name in static_dimensions:
+                    criteria = comparison_criteria[table_name]
 
-                # CRÍTICO: auto_create_table=False para NO crear tablas
-                # overwrite=False para hacer INSERT (append)
-                result = write_pandas(
-                    conn=self.snowflake_conn,
-                    df=df,
-                    table_name=table_name_upper,
-                    database='FLEETLOGIX_DW',
-                    schema='ANALYTICS',
-                    auto_create_table=False,  # ❌ NUNCA crear tablas
-                    overwrite=False,          # ✅ INSERT (append mode)
-                    chunk_size=self.config.batch_size
-                )
+                    # Obtener registros existentes en Snowflake
+                    cursor = self.snowflake_conn.cursor()
+                    columns_str = ', '.join(criteria)
+                    select_query = f"SELECT {columns_str} FROM {table_name_upper}"
+                    cursor.execute(select_query)
+                    existing_records = cursor.fetchall()
+                    cursor.close()
 
-                logger.info(f"✅ {table_name_upper}: {len(df)} registros insertados")
+                    # Convertir a DataFrame para comparación
+                    existing_df = pd.DataFrame(existing_records, columns=criteria)
 
-            logger.info("✅ Carga completada")
+                    if not existing_df.empty:
+                        # Crear tupla de comparación para existing records
+                        existing_tuples = set(existing_df.apply(lambda row: tuple(row), axis=1))
+
+                        # Filtrar DataFrame para incluir solo nuevas combinaciones
+                        def is_new_record(row):
+                            record_tuple = tuple(row[col] for col in criteria)
+                            return record_tuple not in existing_tuples
+
+                        df_filtered = df[df.apply(is_new_record, axis=1)].copy()
+
+                        if df_filtered.empty:
+                            logger.info(f"⏭️  {table_name_upper}: No hay nuevos registros, saltando carga")
+                            continue
+                        else:
+                            logger.info(f"📤 Insertando {len(df_filtered)} nuevos registros en {table_name_upper} (de {len(df)} total)")
+                            df_to_insert = df_filtered
+                    else:
+                        logger.info(f"📤 Insertando en {table_name_upper} (primera carga: {len(df)} registros)...")
+                        df_to_insert = df
+
+                elif table_name in dynamic_dimensions or table_name in fact_tables:
+                    logger.info(f"📤 Insertando en {table_name_upper}...")
+                    df_to_insert = df
+
+                else:
+                    logger.warning(f"⚠️  Tabla {table_name_upper} no reconocida, insertando de todas formas...")
+                    df_to_insert = df
+
+                # Insertar solo los registros filtrados
+                if not df_to_insert.empty:
+                    result = write_pandas(
+                        conn=self.snowflake_conn,
+                        df=df_to_insert,
+                        table_name=table_name_upper,
+                        database='FLEETLOGIX_DW',
+                        schema='ANALYTICS',
+                        auto_create_table=False,  # ❌ NUNCA crear tablas
+                        overwrite=False,          # ✅ INSERT (append mode)
+                        chunk_size=self.config.batch_size
+                    )
+
+                    logger.info(f"✅ {table_name_upper}: {len(df_to_insert)} registros insertados")
+
+            logger.info("✅ Carga incremental completada")
             return True
 
         except Exception as e:
-            logger.error(f"❌ Error en carga: {e}")
+            logger.error(f"❌ Error en carga incremental: {e}")
             return False
 
     def load_to_staging(self, deliveries_df: pd.DataFrame) -> bool:

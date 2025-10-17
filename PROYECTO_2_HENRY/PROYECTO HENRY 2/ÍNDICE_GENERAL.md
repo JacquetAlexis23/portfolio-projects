@@ -23,8 +23,6 @@ Este índice te ayudará a encontrar rápidamente la información que necesitas.
 | Documento | Propósito |
 |-----------|-----------|
 | **RESUMEN_PROYECTO.md** | Resumen ejecutivo con métricas y logros |
-| **INSTRUCCIONES_PDF.md** | Cómo convertir los Markdown a PDF |
-
 ---
 
 ## 🔧 Por Script/Código
@@ -266,9 +264,6 @@ Este índice te ayudará a encontrar rápidamente la información que necesitas.
 
 ## 📞 Ayuda y Soporte
 
-### ¿Cómo convertir a PDF?
-Ver `INSTRUCCIONES_PDF.md`
-
 ### ¿Cómo ejecutar los scripts?
 Ver `README.md` → "Uso de Scripts"
 
@@ -320,4 +315,3 @@ Usa este checklist para asegurarte de haber revisado todo:
 
 **Última actualización:** 9 de Octubre de 2025
 
-**🎓 ¡Éxito en tu revisión y presentación del proyecto!** 🎓

@@ -302,6 +302,6 @@ GROUP BY d.driver_id, driver_name;
 ```
 
 ---
-**Documento generado por**: Análisis de Científico de Datos y Experto en SQL  
+**Documento generado por**: Análisis de Jacquet Alexis - Científico de Datos y Experto en SQL
 **Fecha**: 19 de septiembre de 2025  
 **Versión**: 2.0 - Documentación Profesional FleetLogix

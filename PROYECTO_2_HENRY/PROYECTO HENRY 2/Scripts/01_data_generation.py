@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-FleetLogix Enhanced Data Generator - Versión Científico de Datos Experto
-Combina lo mejor de 01_data_generation.py y generation.py
+GENERADOR DE DATOS CIENTÍFICO MEJORADO PARA FLEETLOGIX
 
 MEJORAS IMPLEMENTADAS:
 1. ✅ Nombres españoles con consistencia de género garantizada

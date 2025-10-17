@@ -228,5 +228,3 @@ for i in tqdm(range(0, len(data_tuples), batch_size)):
 - **Synthetic Data Generation**: Jordon et al. (2022)
 
 ---
-
-*Documento generado automáticamente como parte del sistema de control de calidad del Proyecto Integrador FleetLogix*

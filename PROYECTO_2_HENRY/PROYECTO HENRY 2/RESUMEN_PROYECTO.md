@@ -3,7 +3,7 @@
 ## ✅ Proyecto Completo - 100% Documentado
 
 **Fecha de Finalización:** 9 de Octubre de 2025  
-**Autor:** Científico de Datos Experto  
+**Autor:** Jacquet Alexis - Científico de Datos
 **Institución:** HENRY - Módulo 2  
 
 ---
@@ -306,7 +306,6 @@ Este proyecto representa **100+ horas** de trabajo profesional, aplicando las me
 - [x] Diagramas y visualizaciones
 - [x] README con instrucciones
 - [x] requirements.txt
-- [x] Guía para convertir a PDF
 
 ---
 
