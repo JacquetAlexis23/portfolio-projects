@@ -1,0 +1,142 @@
+# Documentación Row-Level Security (RLS)
+
+## Requisito 2: Tabla de Usuarios ✅
+
+**Campos creados:**
+- Email: Identificador único del usuario (correo electrónico simulado) ✅
+- CiudadAsociada: Ciudad a la que tiene acceso el usuario (ciudad/región) ✅
+- SucursalAsociada: Sucursal específica del usuario (tienda asociada) ✅
+- Rol: Tipo de usuario (Gerente Nacional/Regional/Sucursal) ✅
+
+**Datos cargados:**
+- 1 Gerente Nacional (acceso total)
+- 4 Gerentes Regionales (1 por ciudad)
+- 6 Gerentes de Sucursal (1 por sucursal)
+- Total: 11 usuarios simulados ✅
+
+## Requisito 3: Relaciones para Filtros Dinámicos ✅
+
+**Nota Importante:** El requisito 3 NO requiere relaciones físicas entre Usuarios y otras tablas.
+Los "filtros dinámicos" se implementan mediante expresiones DAX en RLS.
+
+**Relaciones del Modelo de Datos (existentes):**
+1. Ciudades[CiudadID] → Sucursales[CiudadID]
+   - Permite que filtros en Ciudades se propaguen a Sucursales
+   
+2. Sucursales[SucursalID] → Facturas[SucursalID]
+   - Permite que filtros en Sucursales se propaguen a Ventas (Facturas)
+   
+3. Facturas[FacturaID] → DetalleFacturas[FacturaID]
+   - Permite que filtros se propaguen al detalle de ventas
+
+**Cadena de Filtrado RLS:**
+```
+Usuario (filtro DAX) → Ciudades → Sucursales → Facturas (Ventas) → DetalleFacturas
+Usuario (filtro DAX) → Sucursales → Facturas (Ventas) → DetalleFacturas
+```
+
+**Por qué NO se necesitan relaciones físicas Usuarios → Ciudades/Sucursales:**
+- RLS usa LOOKUPVALUE para obtener los valores asociados al usuario
+- Los filtros DAX se aplican directamente en las tablas dimensionales
+- La propagación es automática a través de las relaciones existentes del modelo
+
+## Roles RLS Implementados
+
+### 1. Gerente Nacional
+- **Acceso:** Total, sin restricciones
+- **Filtro:** Ninguno
+- **Usuarios:** gerente.nacional@empresa.com
+
+### 2. Gerente Regional
+- **Acceso:** Solo datos de su ciudad asignada
+- **Filtro DAX en tabla Ciudades:**
+```dax
+[NombreCiudad] = 
+LOOKUPVALUE(
+    Usuarios[CiudadAsociada], 
+    Usuarios[Email], 
+    USERPRINCIPALNAME()
+) 
+&& LOOKUPVALUE(
+    Usuarios[CiudadAsociada], 
+    Usuarios[Email], 
+    USERPRINCIPALNAME()
+) <> "Todas"
+```
+- **Usuarios:**
+  - gerente.bogota@empresa.com → Bogotá
+  - gerente.cali@empresa.com → Cali
+  - gerente.medellin@empresa.com → Medellín
+  - gerente.pereira@empresa.com → Pereira
+
+### 3. Gerente Sucursal
+- **Acceso:** Solo datos de su sucursal específica
+- **Filtro DAX en tabla Sucursales:**
+```dax
+[NombreSucursal] = 
+LOOKUPVALUE(
+    Usuarios[SucursalAsociada], 
+    Usuarios[Email], 
+    USERPRINCIPALNAME()
+)
+&& LOOKUPVALUE(
+    Usuarios[SucursalAsociada], 
+    Usuarios[Email], 
+    USERPRINCIPALNAME()
+) <> "Todas"
+```
+- **Usuarios:**
+  - sucursal.bogota1@empresa.com → TechCore Bogotá #1
+  - sucursal.bogota2@empresa.com → TechCore Bogotá #2
+  - sucursal.cali@empresa.com → TechCore Cali
+  - sucursal.medellin1@empresa.com → TechCore Medellín #1
+  - sucursal.medellin2@empresa.com → TechCore Medellín #2
+  - sucursal.pereira@empresa.com → TechCore Pereira
+
+## Funcionamiento
+
+1. **USERPRINCIPALNAME():** Obtiene el email del usuario autenticado
+2. **LOOKUPVALUE:** Busca la ciudad/sucursal asignada al usuario
+3. **Comparación:** Filtra los datos para mostrar solo lo permitido
+4. **Condición "Todas":** Excluye a gerentes con acceso total
+
+## Pruebas Realizadas
+
+### Caso 1: Gerente Nacional
+- Usuario: gerente.nacional@empresa.com
+- Resultado: ✅ Ve todas las ciudades y sucursales
+
+### Caso 2: Gerente Regional (Bogotá)
+- Usuario: gerente.bogota@empresa.com
+- Resultado: ✅ Ve solo datos de Bogotá (ambas sucursales)
+
+### Caso 3: Gerente Sucursal (Bogotá #1)
+- Usuario: sucursal.bogota1@empresa.com
+- Resultado: ✅ Ve solo datos de TechCore Bogotá #1
+
+## Publicación y Asignación
+
+Para implementar en Power BI Service:
+
+1. Publica el informe al servicio de Power BI
+2. Ve al workspace → Dataset → Configuración → Seguridad
+3. Asigna usuarios reales a cada rol:
+   - Rol "Gerente Nacional" → Usuarios con acceso total
+   - Rol "Gerente Regional" → Usuarios regionales
+   - Rol "Gerente Sucursal" → Usuarios de sucursales
+4. Los filtros se aplicarán automáticamente según el email del usuario
+
+## Mantenimiento
+
+Para agregar nuevos usuarios:
+1. Edita la tabla Usuarios en Power Query
+2. Agrega nueva fila con: Email, CiudadAsociada, SucursalAsociada, Rol
+3. Actualiza el modelo
+4. En Power BI Service, asigna el usuario al rol correspondiente
+
+## Seguridad
+
+- Los filtros RLS son obligatorios y no pueden ser evitados por usuarios finales
+- Los administradores pueden ver todos los datos usando "Ver como"
+- Los roles se validan contra Azure AD en Power BI Service
+- Los emails deben coincidir exactamente (case-sensitive)
